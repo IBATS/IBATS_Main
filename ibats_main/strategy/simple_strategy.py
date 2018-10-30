@@ -9,16 +9,16 @@
 """
 import logging
 import time
-from ibats_common.common import BacktestTradeMode, PeriodType, RunMode, ContextKey, Direction
-from ibats_common.strategy import StgBase
-from ibats_common.strategy import StgHandlerBase
-from ibats_main.config import config
+import pandas as pd
+from ibats_main.config import config  # 单策略执行时，该语句需写在加载 ibats_common 模块前面，以便首先更新数据库配置信息
+from ibats_common.common import BacktestTradeMode, PeriodType, RunMode, ContextKey, Direction, ExchangeName
+from ibats_common.strategy import StgBase, strategy_handler_factory
 # 下面代码是必要的引用
 # md_agent md_agent 并没有“显式”的被使用，但是在被引用期间，已经将相应的 agent 类注册到了相应的列表中
 import ibats_bitmex_trader.agent.md_agent
 import ibats_bitmex_trader.agent.td_agent
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class MACroseStg(StgBase):
@@ -29,8 +29,8 @@ class MACroseStg(StgBase):
         self.ma10 = []
         self.unit = unit
 
-    def on_prepare_min1(self, md_df, context):
-        if md_df is not None:
+    def on_prepare_min1(self, md_df: pd.DataFrame, context):
+        if md_df is not None and md_df.shape[0] > 0:
             self.ma5 = list(md_df['close'].rolling(5, 5).mean())[10:]
             self.ma10 = list(md_df['close'].rolling(10, 10).mean())[10:]
 
@@ -66,32 +66,31 @@ class MACroseStg(StgBase):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG, format=config.LOG_FORMAT)
     # 参数设置
     strategy_params = {'unit': 100000}
     md_agent_params_list = [{
-        'name': 'min1',
         'md_period': PeriodType.Min1,
-        'instrument_id_list': ['ethbtc'],  # ['jm1711', 'rb1712', 'pb1801', 'IF1710'],
-        'init_md_date_to': '2018-6-17',
-        'init_md_date_to': '2018-6-19',
+        'instrument_id_list': ['ETHUSD'],
+        'init_md_date_from': '2018-7-19',
+        'init_md_date_to': '2018-10-21',
     }]
     run_mode_realtime_params = {
         'run_mode': RunMode.Realtime,
     }
     run_mode_backtest_params = {
         'run_mode': RunMode.Backtest,
-        'date_from': '2018-6-18',
-        'date_to': '2018-6-19',
+        'date_from': '2018-7-19',
+        'date_to': '2018-7-20',
         'init_cash': 1000000,
         'trade_mode': BacktestTradeMode.Order_2_Deal
     }
     # run_mode = RunMode.BackTest
     # 初始化策略处理器
-    stghandler = StgHandlerBase.factory(stg_class_obj=MACroseStg,
-                                        strategy_params=strategy_params,
-                                        md_agent_params_list=md_agent_params_list,
-                                        **run_mode_backtest_params)
+    stghandler = strategy_handler_factory(stg_class=MACroseStg,
+                                          strategy_params=strategy_params,
+                                          md_agent_params_list=md_agent_params_list,
+                                          exchange_name=ExchangeName.BitMex,
+                                          **run_mode_backtest_params)
     stghandler.start()
     time.sleep(10)
     stghandler.keep_running = False
