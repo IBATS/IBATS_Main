@@ -9,3 +9,4 @@ IBATS_Common
 IBATS_BitMex_Feeder
 IBATS_BitMex_Trader
 matplotlib>=3.0.1
+click>=7.0
