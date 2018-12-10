@@ -13,7 +13,7 @@ with open("README.md", "r", encoding='utf-8') as rm:
     long_description = rm.read()
 
 setup(name='IBATS_Main',
-      version='0.2.1',
+      version='0.2.2',
       description='IBATS（Integration Backtest Analysis Trade System）集成回测框架（后端主程序）主框架，链接所有Traders，完成回测、模拟、实盘交易、分析等动作。',
       long_description=long_description,
       long_description_content_type='text/markdown',
