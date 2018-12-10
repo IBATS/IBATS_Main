@@ -16,8 +16,10 @@ from ibats_common.strategy import StgBase
 from ibats_common.strategy_handler import strategy_handler_factory
 # 下面代码是必要的引用
 # md_agent md_agent 并没有“显式”的被使用，但是在被引用期间，已经将相应的 agent 类注册到了相应的列表中
-import ibats_bitmex_trader.agent.md_agent
-import ibats_bitmex_trader.agent.td_agent
+# import ibats_bitmex_trader.agent.md_agent
+# import ibats_bitmex_trader.agent.td_agent
+import ibats_huobi_trader.agent.md_agent
+import ibats_huobi_trader.agent.td_agent
 
 logger = logging.getLogger(__name__)
 
@@ -72,9 +74,9 @@ if __name__ == '__main__':
     strategy_params = {'unit': 100}
     md_agent_params_list = [{
         'md_period': PeriodType.Min1,
-        'instrument_id_list': ['ETHUSD'],
-        'init_md_date_from': '2018-7-19',  # 行情初始化加载历史数据，供策略分析预加载使用
-        'init_md_date_to': '2018-10-21',
+        'instrument_id_list': ['ETHUSDT'],
+        'init_md_date_from': '2018-7-17',  # 行情初始化加载历史数据，供策略分析预加载使用
+        'init_md_date_to': '2018-7-18',
     }]
     if run_mode == RunMode.Realtime:
         trade_agent_params = {
@@ -87,15 +89,15 @@ if __name__ == '__main__':
             'init_cash': 1000000,
         }
         strategy_handler_param = {
-            'date_from': '2018-7-19',  # 策略回测历史数据，回测指定时间段的历史行情
-            'date_to': '2018-7-20',
+            'date_from': '2018-10-29',  # 策略回测历史数据，回测指定时间段的历史行情
+            'date_to': '2018-10-30',
         }
     # run_mode = RunMode.BackTest
     # 初始化策略处理器
     stghandler = strategy_handler_factory(stg_class=MACroseStg,
                                           strategy_params=strategy_params,
                                           md_agent_params_list=md_agent_params_list,
-                                          exchange_name=ExchangeName.BitMex,
+                                          exchange_name=ExchangeName.HuoBi,
                                           run_mode=RunMode.Backtest,
                                           trade_agent_params=trade_agent_params,
                                           strategy_handler_param=strategy_handler_param,
