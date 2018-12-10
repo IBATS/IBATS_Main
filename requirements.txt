@@ -5,8 +5,10 @@ mysqlclient>=1.3.8
 numpy==1.14.4
 pandas==0.23.0
 SQLAlchemy==1.2.8
+matplotlib>=3.0.1
+click>=7.0
 IBATS_Common
 IBATS_BitMex_Feeder
 IBATS_BitMex_Trader
-matplotlib>=3.0.1
-click>=7.0
+IBATS_Huobi_Feeder
+IBATS_Huobi_Trader
